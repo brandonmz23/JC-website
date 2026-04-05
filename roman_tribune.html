@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Roman Post</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a0f05;
+    --ink-mid: #2e1a08;
+    --paper: #f2e8d5;
+    --paper-dark: #e0d0b0;
+    --paper-mid: #ecdfc5;
+    --red: #8b1a1a;
+    --red-bright: #a82020;
+    --gold: #8a6a1a;
+    --gold-light: #b8921f;
+    --rule: #3a2010;
+    --rule-light: #7a5030;
+    --text: #1a0f05;
+    --text-mid: #3a2515;
+    --text-dim: #5a4030;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    font-family: 'IM Fell English', Georgia, serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  /* Paper texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.07'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* === WRAPPER === */
+  .newspaper {
+    width: 100%;
+    margin: 0;
+    background: var(--paper);
+    position: relative;
+  }
+
+  /* aged edge vignette */
+  .newspaper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 60px rgba(100,60,10,0.25);
+    pointer-events: none;
+  }
+
+  /* === BANNER === */
+  .banner {
+    border-bottom: 4px double var(--rule);
+    padding: 0.8rem 2rem 0;
+    text-align: center;
+    background: var(--paper);
+  }
+
+  .banner-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--rule-light);
+    margin-bottom: 0.6rem;
+  }
+
+  .paper-name {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: clamp(3rem, 8vw, 6rem);
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: 0.02em;
+    text-shadow: 2px 2px 0 rgba(100,60,10,0.2);
+    margin-bottom: 0.2rem;
+  }
+
+  .paper-slogan {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.6rem;
+  }
+
+  .banner-rule-thick {
+    height: 3px;
+    background: var(--ink);
+    margin: 0.3rem 0 0;
+  }
+
+  .banner-rule-thin {
+    height: 1px;
+    background: var(--ink);
+    margin: 0.15rem 0 0;
+  }
+
+  /* === EDITION BAR === */
+  .edition-bar {
+    background: var(--ink);
+    color: var(--paper);
+    text-align: center;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.3rem 2rem;
+  }
+
+  /* === FRONT PAGE === */
+  .front-page {
+    padding: 1.5rem 2rem;
+  }
+
+  /* === HEADLINE === */
+  .headline-block {
+    text-align: center;
+    border-bottom: 2px solid var(--rule);
+    padding-bottom: 1.2rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .kicker {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+
+  h1.main-headline {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 5vw, 3.8rem);
+    line-height: 1.05;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  .deck {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--text-mid);
+    max-width: 680px;
+    margin: 0 auto 0.5rem;
+    line-height: 1.4;
+  }
+
+  .byline {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .dateline {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    font-style: italic;
+    margin-bottom: 0.5rem;
+  }
+
+  /* === 3-COLUMN LAYOUT === */
+  .cols-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border-bottom: 2px solid var(--rule);
+    margin-bottom: 1.5rem;
+  }
+
+  .col {
+    padding: 0 1.2rem;
+    border-right: 1px solid var(--rule-light);
+  }
+
+  .col:first-child { padding-left: 0; }
+  .col:last-child { border-right: none; padding-right: 0; }
+
+  .cols-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-bottom: 2px solid var(--rule);
+    margin-bottom: 1.5rem;
+  }
+
+  .cols-2 .col:first-child { padding-left: 0; }
+  .cols-2 .col:last-child { border-right: none; padding-right: 0; }
+
+  /* wide + narrow */
+  .cols-wide-narrow {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 0;
+    border-bottom: 2px solid var(--rule);
+    margin-bottom: 1.5rem;
+  }
+
+  .cols-wide-narrow .col:first-child { padding-left: 0; }
+  .cols-wide-narrow .col:last-child { border-right: none; padding-right: 0; }
+
+  /* === ARTICLE TYPOGRAPHY === */
+  .article-headline {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+  }
+
+  .article-headline.sm {
+    font-size: 1rem;
+  }
+
+  .article-deck {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.88rem;
+    color: var(--text-mid);
+    margin-bottom: 0.4rem;
+    line-height: 1.35;
+  }
+
+  .article-body {
+    font-family: 'IM Fell English', serif;
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--text);
+    text-align: justify;
+    hyphens: auto;
+  }
+
+  .article-body p { margin-bottom: 0.6rem; }
+
+  .article-body p:first-of-type::first-letter {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.2rem;
+    font-weight: 900;
+    float: left;
+    line-height: 0.75;
+    margin: 0.1rem 0.3rem 0 0;
+    color: var(--red);
+  }
+
+  .col-rule {
+    border-top: 2px solid var(--rule);
+    margin: 0.8rem 0;
+  }
+
+  .col-rule-thin {
+    border-top: 1px solid var(--rule-light);
+    margin: 0.6rem 0;
+  }
+
+  /* === PULL QUOTE === */
+  .pull-quote {
+    border-top: 2px solid var(--rule);
+    border-bottom: 2px solid var(--rule);
+    padding: 0.6rem 0.5rem;
+    margin: 0.8rem 0;
+    text-align: center;
+  }
+
+  .pull-quote p {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+
+  /* === SECTION HEADERS === */
+  .section-header {
+    text-align: center;
+    border-top: 3px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 0.4rem 2rem;
+    margin-bottom: 1.2rem;
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
+
+  /* === OBITUARIES === */
+  .obit {
+    border-top: 1px solid var(--rule-light);
+    padding-top: 0.7rem;
+    margin-top: 0.7rem;
+  }
+
+  .obit:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+
+  .obit-name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--ink);
+    margin-bottom: 0.15rem;
+  }
+
+  .obit-dates {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  /* === EDITORIAL BOX === */
+  .editorial-box {
+    border: 2px solid var(--rule);
+    padding: 1rem 1.2rem;
+    margin: 0.8rem 0;
+    background: var(--paper-mid);
+  }
+
+  .editorial-label {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--red);
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  /* === POLITICAL CARTOON === */
+  .cartoon-box {
+    border: 1px solid var(--rule-light);
+    padding: 1rem;
+    text-align: center;
+    background: var(--paper-mid);
+  }
+
+  .cartoon-svg {
+    width: 100%;
+    max-width: 340px;
+    height: auto;
+    display: block;
+    margin: 0 auto 0.6rem;
+  }
+
+  .cartoon-caption {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    line-height: 1.3;
+  }
+
+  /* === AD BOX === */
+  .ad-box {
+    border: 2px solid var(--rule);
+    padding: 0.8rem;
+    text-align: center;
+    margin-top: 0.8rem;
+  }
+
+  .ad-box p {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.78rem;
+    color: var(--text-mid);
+    line-height: 1.4;
+  }
+
+  .ad-box .ad-title {
+    font-weight: 700;
+    font-style: normal;
+    font-size: 0.85rem;
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+
+  /* === FOOTER === */
+  .paper-footer {
+    border-top: 3px double var(--rule);
+    padding: 0.8rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--paper-dark);
+  }
+
+  .paper-footer p {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 700px) {
+    .cols-3, .cols-2, .cols-wide-narrow {
+      grid-template-columns: 1fr;
+    }
+    .col {
+      border-right: none;
+      border-bottom: 1px solid var(--rule-light);
+      padding: 0 0 1rem 0;
+      margin-bottom: 0.5rem;
+    }
+    .col:last-child { border-bottom: none; }
+    .banner-meta { flex-direction: column; gap: 0.3rem; text-align: center; }
+    .paper-footer { flex-direction: column; gap: 0.4rem; text-align: center; }
+    .front-page { padding: 1rem; }
+  }
+
+  /* === NAV === */
+  .nav-bar {
+    background: var(--paper-dark);
+    border-bottom: 2px solid var(--rule);
+    border-top: 1px solid var(--rule-light);
+    padding: 0.3rem 2rem;
+    display: flex;
+    gap: 0;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .nav-bar a {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 0.2rem 0.9rem;
+    border-right: 1px solid var(--rule-light);
+  }
+
+  .nav-bar a:last-child { border-right: none; }
+  .nav-bar a:hover { color: var(--red); }
+
+  /* drop cap no-repeat after first use */
+  .no-drop::first-letter { all: unset; }
+</style>
+</head>
+<body>
+
+<div class="newspaper">
+
+  <!-- BANNER -->
+  <header class="banner">
+    <div class="banner-meta">
+      <span>VOL. DCCX &nbsp;·&nbsp; NO. XLIV</span>
+      <span>PRICE: I Sestertius</span>
+      <span>FOUNDED 753 BCE &nbsp;·&nbsp; SINCE THE START OF ROME</span>
+    </div>
+
+    <div class="paper-name">The Roman Post</div>
+    <div class="paper-slogan"> Quote of the day: "Veni, vidi, vici" (I came; I saw; I conquered) - Julius Caesar</div>
+
+    <div class="banner-rule-thick"></div>
+    <div class="banner-rule-thin"></div>
+  </header>
+
+  <!-- EDITION BAR -->
+  <div class="edition-bar">
+    Special Edition &nbsp;·&nbsp; The Ides of March, XLIV BC (March 15th, 44 BC) &nbsp;·&nbsp; Rome
+  </div>
+
+  <!-- NAV -->
+  <nav class="nav-bar">
+    <a href="#main">Front Page</a>
+    <a href="#antony">Antony's Speech</a>
+    <a href="#octavian">Octavian</a>
+    <a href="#editorial">Editorial</a>
+    <a href="#cartoon">Cartoon</a>
+    <a href="#obituaries">Obituaries</a>
+  </nav>
+
+  <!-- FRONT PAGE -->
+  <main class="front-page">
+
+    <!-- MAIN HEADLINE -->
+    <div class="headline-block" id="main">
+      <span class="kicker">Breaking News — Rome in Crisis</span>
+      <h1 class="main-headline">CAESAR SLAIN<br>IN THE SENATE</h1>
+      <p class="deck">Dictator of Rome Struck Down by 23 Conspirators at the Base of Pompey's Statue; Brutus Among the Assassins; City Descends Into Shock and Fury</p>
+      <p class="byline">By Our Senate Correspondent &nbsp;·&nbsp; Staff of the Roman Post</p>
+    </div>
+    
+    <!-- FEATURE IMAGE -->
+    <div style="margin-bottom: 1.2rem; border-bottom: 2px solid var(--rule);">
+  <img
+    src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Marc_Antony%27s_Oration_at_Caesar%27s_Funeral_by_George_Edward_Robertson.jpg/960px-Marc_Antony%27s_Oration_at_Caesar%27s_Funeral_by_George_Edward_Robertson.jpg"
+    alt="La morte di Cesare — Vincenzo Camuccini, 1804 (Mark Antony's Oration at Caesar's Funeral)"
+    style="width: 80%; display: block; margin: 0 auto; max-height: 420px; object-fit: cover; object-position: center 70%;"
+  >
+  <p style="font-family: 'Libre Baskerville', serif; font-size: 0.68rem; color: var(--text-dim); font-style: italic; padding: 0.35rem 0.5rem;">
+    <em>La morte di Cesare</em> — Vincenzo Camuccini, 1804–1805. Oil on canvas. Museo Nazionale di Capodimonte, Naples. (Mark Antony's Oration at Caesar's Funeral)
+  </p>
+</div>
+
+
+    <!-- MAIN 3-COL STORY -->
+    <div class="cols-3">
+      <div class="col">
+        <p class="dateline">ROME, THE THEATRE OF POMPEY —</p>
+        <div class="article-body">
+          <p>Julius Caesar, Dictator of Rome and the most powerful man in the known world, was assassinated this morning in the Theatre of Pompey during a session of the Senate. He was 55 years of age. A group of approximately 23 senators, who have since named themselves the Liberatores — the Liberators — surrounded Caesar at the base of Pompey's statue and stabbed him in a coordinated attack. Physicians on the scene report that Caesar sustained 23 separate wounds, though only one proved fatal.</p>
+          <p>The conspiracy was masterminded by Gaius Cassius Longinus, a former general who had long harboured resentment toward Caesar's rise to power.</p>
+        </div>
+
+        <div class="pull-quote">
+          <p>"Upon recognising Brutus among his attackers, Caesar ceased to resist, covered his face with his toga, and fell."</p>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="article-body no-drop">
+          <p>Most shocking to the Roman public was the involvement of Marcus Junius Brutus — Caesar's close friend and a man Caesar had personally pardoned after the Battle of Pharsalus. Eyewitnesses report that upon recognising Brutus among his attackers, Caesar ceased to resist, covered his face with his toga, and uttered his final words.</p>
+
+          <p>Caesar had been warned. Just weeks ago, a soothsayer approached him in the streets with a single warning: "Beware the Ides of March." Caesar dismissed the man as a dreamer. This very morning, his wife Calpurnia begged him to stay home, reporting nightmares of his statue running with blood and Romans bathing their hands in it.</p>
+
+          <p>Caesar was persuaded by senator Decius Brutus, who told him the Senate planned to offer him the crown today — and that refusing to attend would appear cowardly. He left for the Senate and never returned.</p>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="article-body no-drop">
+          <p>Mark Antony, Caesar's most loyal general and co-consul, was deliberately kept outside the Senate chamber by the conspirator Trebonius during the attack. Had Antony been present, those close to the situation believe the outcome may have been very different. Antony has since retrieved Caesar's body and is expected to speak at the funeral.</p>
+
+          <p>Rome is in shock. Citizens have gathered in the Forum in enormous numbers. The conspirators appeared on the steps of the Capitol shortly after the killing, calling out that Rome was free — but were met not with celebration, but with fear and confusion.</p>
+
+          <p>As of this evening, Brutus and Cassius have retreated to their homes, and armed guards have been posted throughout the city. The future of the Republic is deeply uncertain.</p>
+        </div>
+
+        <div class="col-rule"></div>
+
+        <div class="ad-box">
+          <p><span class="ad-title">MARCUS LEPIDUS</span>
+          Offers his legions in service to the stability of Rome. The Republic must be defended. Report to the Aventine Hill.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANTONY + CARTOON -->
+    <div class="section-header" id="antony">
+      <h2>Inside Rome — Funeral & Aftermath</h2>
+    </div>
+
+    <div class="cols-wide-narrow">
+      <div class="col">
+        <span class="kicker">The Forum Romanum</span>
+        <h2 class="article-headline">ANTONY TURNS THE CITY AGAINST THE CONSPIRATORS IN STUNNING FUNERAL ORATION</h2>
+        <p class="article-deck">General's Speech Calls Brutus "Honorable" So Many Times the Word Becomes an Accusation; Will Reveals Caesar Left Money to Every Citizen</p>
+        <div class="col-rule-thin"></div>
+        <p class="byline">By Our Forum Correspondent</p>
+        <br>
+        <div class="article-body">
+          <p>What began as a measured funeral oration became perhaps the most consequential speech ever delivered in the Forum Romanum. Mark Antony, given permission by the conspirators to speak at Caesar's funeral on the condition that he not blame them directly, proceeded to dismantle their reputation word by word.</p>
+
+          <p>Antony opened by insisting he came only to bury Caesar, not to praise him — but over the course of his speech, he systematically dismantled every justification the conspirators had offered. He referred to Brutus repeatedly as "an honorable man," a phrase he repeated so many times that by the end, the crowd understood it as the deepest possible insult.</p>
+
+          <p>He displayed Caesar's bloodied toga to the crowd, pointing out each tear made by a different conspirator's blade. He named Brutus's stab wound the "most unkindest cut of all," arguing that it was Brutus's betrayal — not the physical wound — that truly killed Caesar.</p>
+
+          <p>Then Antony produced Caesar's will. Caesar had left 75 drachmas to every Roman citizen, and his personal gardens along the Tiber to the public as a park for all people to use freely. The reading of the will sent the crowd into a frenzy of grief and rage. Citizens tore apart wooden benches and market stalls to build a funeral pyre for Caesar on the spot.</p>
+
+          <p>Mobs then turned on the homes of the conspirators, forcing Brutus and Cassius to flee Rome entirely. Political analysts note that Antony never once directly accused the conspirators of wrongdoing — yet the effect of his speech was more devastating than any accusation could have been.</p>
+        </div>
+
+        <div class="pull-quote">
+          <p>"He used Caesar's own generosity as a weapon, and let the crowd's emotion do the rest."</p>
+        </div>
+      </div>
+
+      <div class="col" id="cartoon">
+        <span class="kicker">Political Cartoon</span>
+        <h2 class="article-headline sm">The Liberators — Before &amp; After</h2>
+        <div class="col-rule-thin"></div>
+        <br>
+
+        <!-- SVG POLITICAL CARTOON -->
+        <div class="cartoon-box">
+          <svg class="cartoon-svg" viewBox="0 0 320 420" xmlns="http://www.w3.org/2000/svg">
+            <!-- paper background -->
+            <rect width="320" height="420" fill="#ecdfc5"/>
+
+            <!-- PANEL 1 LABEL -->
+            <text x="80" y="18" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-style="italic" fill="#3a2010">BEFORE</text>
+            <line x1="0" y1="22" x2="160" y2="22" stroke="#3a2010" stroke-width="0.8"/>
+
+            <!-- Panel 1: senators with daggers behind backs -->
+            <!-- Caesar standing tall -->
+            <ellipse cx="80" cy="55" rx="10" ry="11" fill="none" stroke="#1a0f05" stroke-width="1.5"/>
+            <line x1="80" y1="66" x2="80" y2="115" stroke="#1a0f05" stroke-width="2"/>
+            <line x1="80" y1="80" x2="60" y2="95" stroke="#1a0f05" stroke-width="1.5"/>
+            <line x1="80" y1="80" x2="100" y2="95" stroke="#1a0f05" stroke-width="1.5"/>
+            <line x1="80" y1="115" x2="65" y2="140" stroke="#1a0f05" stroke-width="1.5"/>
+            <line x1="80" y1="115" x2="95" y2="140" stroke="#1a0f05" stroke-width="1.5"/>
+            <!-- Laurel crown -->
+            <path d="M70,47 Q75,40 80,44 Q85,40 90,47" fill="none" stroke="#8a6a1a" stroke-width="1.5"/>
+            <!-- Caesar label -->
+            <text x="80" y="155" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#1a0f05">CAESAR</text>
+
+            <!-- Conspirator 1 (left) -->
+            <ellipse cx="35" cy="62" rx="8" ry="9" fill="none" stroke="#1a0f05" stroke-width="1.2"/>
+            <line x1="35" y1="71" x2="35" y2="110" stroke="#1a0f05" stroke-width="1.5"/>
+            <line x1="35" y1="83" x2="55" y2="78" stroke="#1a0f05" stroke-width="1.2"/>
+            <!-- arm hidden behind back with dagger -->
+            <line x1="35" y1="83" x2="20" y2="88" stroke="#1a0f05" stroke-width="1.2"/>
+            <line x1="20" y1="88" x2="15" y2="98" stroke="#1a0f05" stroke-width="1.2"/>
+            <polygon points="15,98 12,108 18,105" fill="#1a0f05"/>
+            <line x1="35" y1="110" x2="25" y2="135" stroke="#1a0f05" stroke-width="1.2"/>
+            <line x1="35" y1="110" x2="45" y2="135" stroke="#1a0f05" stroke-width="1.2"/>
+            <!-- HONOR label on toga -->
+            <text x="35" y="97" text-anchor="middle" font-family="Georgia,serif" font-size="5.5" fill="#1a0f05">HONOR</text>
+            <text x="35" y="150" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#1a0f05">BRUTUS</text>
+
+            <!-- Conspirator 2 (right) -->
+            <ellipse cx="125" cy="62" rx="8" ry="9" fill="none" stroke="#1a0f05" stroke-width="1.2"/>
+            <line x1="125" y1="71" x2="125" y2="110" stroke="#1a0f05" stroke-width="1.5"/>
+            <line x1="125" y1="83" x2="105" y2="78" stroke="#1a0f05" stroke-width="1.2"/>
+            <line x1="125" y1="83" x2="140" y2="88" stroke="#1a0f05" stroke-width="1.2"/>
+            <line x1="140" y1="88" x2="145" y2="98" stroke="#1a0f05" stroke-width="1.2"/>
+            <polygon points="145,98 148,108 142,105" fill="#1a0f05"/>
+            <line x1="125" y1="110" x2="115" y2="135" stroke="#1a0f05" stroke-width="1.2"/>
+            <line x1="125" y1="110" x2="135" y2="135" stroke="#1a0f05" stroke-width="1.2"/>
+            <text x="125" y="97" text-anchor="middle" font-family="Georgia,serif" font-size="5.5" fill="#1a0f05">VIRTUE</text>
+            <text x="125" y="150" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#1a0f05">CASSIUS</text>
+
+            <!-- Panel 1 caption -->
+            <text x="80" y="170" text-anchor="middle" font-family="Georgia,serif" font-size="8" font-style="italic" fill="#3a2010">"We act for Rome."</text>
+
+            <!-- DIVIDER -->
+            <line x1="0" y1="182" x2="160" y2="182" stroke="#3a2010" stroke-width="2"/>
+
+            <!-- PANEL 2 LABEL -->
+            <text x="80" y="196" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-style="italic" fill="#3a2010">AFTER</text>
+            <line x1="0" y1="200" x2="160" y2="200" stroke="#3a2010" stroke-width="0.8"/>
+
+            <!-- FIRE / CHAOS in background -->
+            <path d="M10,290 Q15,265 20,280 Q25,255 30,270 Q35,245 40,265 Q45,250 50,270 L50,300 L10,300Z" fill="#cc4422" opacity="0.7"/>
+            <path d="M90,280 Q95,260 100,272 Q105,250 110,265 Q115,248 120,262 Q125,252 130,268 L130,295 L90,295Z" fill="#cc4422" opacity="0.6"/>
+            <!-- smoke lines -->
+            <path d="M25,265 Q28,250 25,240" fill="none" stroke="#5a4030" stroke-width="1" opacity="0.5"/>
+            <path d="M110,260 Q113,245 110,235" fill="none" stroke="#5a4030" stroke-width="1" opacity="0.5"/>
+
+            <!-- Fleeing Brutus -->
+            <ellipse cx="35" cy="218" rx="8" ry="9" fill="none" stroke="#1a0f05" stroke-width="1.2"/>
+            <line x1="35" y1="227" x2="35" y2="265" stroke="#1a0f05" stroke-width="1.5"/>
+            <line x1="35" y1="240" x2="15" y2="248" stroke="#1a0f05" stroke-width="1.2"/>
+            <line x1="35" y1="240" x2="52" y2="235" stroke="#1a0f05" stroke-width="1.2"/>
+            <line x1="35" y1="265" x2="20" y2="285" stroke="#1a0f05" stroke-width="1.5"/>
+            <line x1="35" y1="265" x2="48" y2="282" stroke="#1a0f05" stroke-width="1.5"/>
+            <!-- running posture: leaning forward -->
+            <text x="35" y="298" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#1a0f05">FLEEING</text>
+
+            <!-- Fleeing Cassius -->
+            <ellipse cx="115" cy="218" rx="8" ry="9" fill="none" stroke="#1a0f05" stroke-width="1.2"/>
+            <line x1="115" y1="227" x2="115" y2="265" stroke="#1a0f05" stroke-width="1.5"/>
+            <line x1="115" y1="240" x2="135" y2="248" stroke="#1a0f05" stroke-width="1.2"/>
+            <line x1="115" y1="240" x2="98" y2="235" stroke="#1a0f05" stroke-width="1.2"/>
+            <line x1="115" y1="265" x2="128" y2="285" stroke="#1a0f05" stroke-width="1.5"/>
+            <line x1="115" y1="265" x2="102" y2="282" stroke="#1a0f05" stroke-width="1.5"/>
+            <text x="115" y="298" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#1a0f05">FLEEING</text>
+
+            <!-- Angry mob gesture -->
+            <text x="78" y="245" text-anchor="middle" font-family="Georgia,serif" font-size="22" fill="#8b1a1a" opacity="0.8">⚔</text>
+
+            <!-- Panel 2 caption -->
+            <text x="80" y="315" text-anchor="middle" font-family="Georgia,serif" font-size="8" font-style="italic" fill="#8b1a1a">"Rome is free — and burning."</text>
+
+            <!-- VERTICAL DIVIDER -->
+            <line x1="160" y1="0" x2="160" y2="420" stroke="#3a2010" stroke-width="1"/>
+
+            <!-- RIGHT PANEL: caption text -->
+            <text x="240" y="18" text-anchor="middle" font-family="Georgia,serif" font-size="10" font-weight="bold" fill="#1a0f05">THE LIBERATORS</text>
+            <line x1="165" y1="22" x2="315" y2="22" stroke="#3a2010" stroke-width="0.8"/>
+
+            <!-- Decorative laurel wreath broken in two -->
+            <path d="M195,60 Q210,40 225,50 Q240,35 255,50 Q265,42 275,55" fill="none" stroke="#8a6a1a" stroke-width="2"/>
+            <path d="M225,50 L225,70" stroke="#8a6a1a" stroke-width="1.5"/>
+            <!-- crack mark -->
+            <path d="M222,52 L228,48" stroke="#8b1a1a" stroke-width="1.5"/>
+
+            <text x="235" y="90" text-anchor="middle" font-family="Georgia,serif" font-size="7.5" font-style="italic" fill="#3a2010">A crown of laurels</text>
+            <text x="235" y="103" text-anchor="middle" font-family="Georgia,serif" font-size="7.5" font-style="italic" fill="#3a2010">broken in two —</text>
+            <text x="235" y="116" text-anchor="middle" font-family="Georgia,serif" font-size="7.5" font-style="italic" fill="#3a2010">like the Republic</text>
+            <text x="235" y="129" text-anchor="middle" font-family="Georgia,serif" font-size="7.5" font-style="italic" fill="#3a2010">they claimed to save.</text>
+
+            <line x1="170" y1="145" x2="310" y2="145" stroke="#3a2010" stroke-width="0.8"/>
+
+            <!-- Caption block -->
+            <text x="235" y="165" text-anchor="middle" font-family="Georgia,serif" font-size="8" font-weight="bold" fill="#8b1a1a">Et tu, 'Republic'?</text>
+
+            <text x="235" y="200" text-anchor="middle" font-family="Georgia,serif" font-size="7.5" fill="#3a2010">They feared a king</text>
+            <text x="235" y="213" text-anchor="middle" font-family="Georgia,serif" font-size="7.5" fill="#3a2010">and gave Rome</text>
+            <text x="235" y="226" text-anchor="middle" font-family="Georgia,serif" font-size="7.5" fill="#3a2010">a civil war instead.</text>
+
+            <line x1="170" y1="240" x2="310" y2="240" stroke="#3a2010" stroke-width="0.8"/>
+
+            <!-- toga labels -->
+            <text x="235" y="265" text-anchor="middle" font-family="Georgia,serif" font-size="7.5" fill="#3a2010">Their togas read</text>
+            <text x="235" y="278" text-anchor="middle" font-family="Georgia,serif" font-size="7.5" font-style="italic" fill="#1a0f05">"HONOR"</text>
+            <text x="235" y="291" text-anchor="middle" font-family="Georgia,serif" font-size="7.5" fill="#3a2010">"VIRTUE"</text>
+            <text x="235" y="304" text-anchor="middle" font-family="Georgia,serif" font-size="7.5" fill="#3a2010">"LIBERTY"</text>
+            <text x="235" y="325" text-anchor="middle" font-family="Georgia,serif" font-size="7.5" fill="#3a2010">Their hands read</text>
+            <text x="235" y="338" text-anchor="middle" font-family="Georgia,serif" font-size="8" font-style="italic" fill="#8b1a1a">blood.</text>
+
+            <line x1="170" y1="355" x2="310" y2="355" stroke="#3a2010" stroke-width="0.8"/>
+            <text x="235" y="375" text-anchor="middle" font-family="Georgia,serif" font-size="7" font-style="italic" fill="#5a4030">— Tribune Staff Artist</text>
+            <text x="235" y="388" text-anchor="middle" font-family="Georgia,serif" font-size="7" font-style="italic" fill="#5a4030">Ides of March, XLIV BCE</text>
+          </svg>
+
+          <p class="cartoon-caption">The Liberators, before and after — their togas bore the words of virtue; their hands bore the blood of Caesar. Rome was to be saved. Rome is on fire.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- OCTAVIAN + EDITORIAL -->
+    <div class="section-header" id="octavian">
+      <h2>Empire &amp; Politics — The Road Ahead</h2>
+    </div>
+
+    <div class="cols-2">
+      <div class="col">
+        <span class="kicker">Rome — Power Struggle</span>
+        <h2 class="article-headline">OCTAVIAN ARRIVES IN ROME; CIVIL WAR LOOMS AS THREE FACTIONS VIE FOR POWER</h2>
+        <p class="article-deck">Caesar's 18-Year-Old Heir Presses His Claim; Antony Refuses to Release Funds; Brutus and Cassius Raising Armies in the East</p>
+        <div class="col-rule-thin"></div>
+        <p class="byline">By Our Political Correspondent</p>
+        <br>
+        <div class="article-body">
+          <p>As Rome reels from the assassination of Julius Caesar, a new figure has quietly arrived in the city: Gaius Octavius, Caesar's 18-year-old great-nephew and, according to Caesar's recently revealed will, his adopted son and primary heir. Octavian, as he is now calling himself, was studying military matters in Apollonia across the Adriatic when word of Caesar's death reached him. He returned to Rome immediately.</p>
+
+          <p>Though young and largely unknown to the Roman public, those in political circles are watching him closely. Caesar was famously selective in his affections, and the decision to name Octavian his heir rather than the more prominent Antony has surprised many. Antony, for his part, is reported to be deeply skeptical of the young man's claim and has thus far refused to release Caesar's personal funds to him.</p>
+
+          <p>Meanwhile, the conspirators Brutus and Cassius have left Rome and are reportedly gathering military forces in the east. Rome now faces the prospect of another civil war — precisely the outcome the conspirators claimed they were trying to prevent by removing Caesar.</p>
+
+          <p>The Senate is divided, the people are enraged, and three powerful men — Antony, Octavian, and the conspirators — are all positioning themselves for what comes next. Rome has not seen the last of its bloodshed.</p>
+        </div>
+      </div>
+
+      <div class="col" id="editorial">
+        <div class="editorial-box">
+          <span class="editorial-label">⬛ Editorial — The View of the Tribune</span>
+          <h2 class="article-headline">DID ROME TRADE ONE TYRANT FOR ANARCHY?</h2>
+          <div class="col-rule-thin"></div>
+          <br>
+          <div class="article-body">
+            <p>The men who killed Julius Caesar called themselves liberators. They believed — or at least claimed to believe — that Caesar's unchecked ambition posed an existential threat to the Roman Republic. For this reasoning, Brutus in particular has been praised as a patriot who loved Rome more than he loved his closest friend.</p>
+
+            <p>But one must ask: what exactly has been liberated?</p>
+
+            <p>Rome is burning tonight. The very Forum where Brutus addressed the people and asked for their patient understanding was torn apart hours later to build Caesar's funeral pyre. The homes of the conspirators have been attacked. Two of Rome's most senior senators are fugitives in their own republic.</p>
+
+            <p>Brutus argued that Caesar had not yet committed the crimes that justified his death — that the assassination was a preemptive strike against potential tyranny. But this is a dangerous principle. If a man may be killed for what he might do, then no one in Rome is safe.</p>
+
+            <p>The conspirators were not wrong that power corrupts, nor that the Republic was fragile. But they were catastrophically wrong about the cure. They removed one man and replaced him with chaos. They feared a king and have given Rome a civil war instead.</p>
+
+            <p>History will have to decide whether Brutus was a hero or a fool — but Rome will be paying the price of that question for generations.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OBITUARIES -->
+    <div class="section-header" id="obituaries">
+      <h2>Obituaries — Those Claimed by the Ides</h2>
+    </div>
+
+    <div class="cols-3">
+      <div class="col">
+        <div class="obit">
+          <p class="obit-name">Julius Caesar</p>
+          <p class="obit-dates">100 BCE – 15 March, 44 BCE &nbsp;·&nbsp; Aged 55 &nbsp;·&nbsp; Dictator of Rome</p>
+          <div class="article-body">
+            <p>Gaius Julius Caesar, age 55, Rome's greatest general, was killed yesterday in the Senate House by a group of conspirators that claim to have acted in the Republic's best interest. The city has erupted in grief and anger following the funeral rites held this afternoon.  </p>
+            <p>Caesar, celebrated for his military achievements including his victories in Gaul. His popularity among the common people was unmatched, earning him widespread devotion. However, these honors have been announced as a threat to our democracy by Marcus Brutus, one of the conspirators. The assassination was carried out in the Senate where witnesses have reported that Caesar recived multiple stabs on the back. Falling to the ground as he uttered his final words.</p>
+            <p>Caesar is survived by his wife, Calpurnia, and his son, Octavius, who is expected to return to Rome soon. The political situation for Rome continues to be uncertain as crowds begin to rally in demand for retaliation against the conspirators.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="obit">
+          <p class="obit-name">Marcus Junius Brutus</p>
+          <p class="obit-dates">85 BCE – present &nbsp;·&nbsp; Senator &nbsp;·&nbsp; Currently in exile</p>
+          <div class="article-body">
+            <p>There is no more tragic figure in Rome today than Marcus Brutus. A man universally acknowledged as honorable, principled, and incorruptible, Brutus joined the conspiracy against Caesar not for power, not for money, and not out of personal hatred — but because he genuinely believed Rome required it. He loved Caesar. He wept, it is said, when he made his decision.</p>
+            <p>He argued against killing Antony, believing the assassination should be clean and limited. He trusted the Roman people to understand. He was wrong on nearly every count, and yet it is nearly impossible to call him a villain.</p>
+            <p>Brutus was a man built for a better world than the one he lived in — a world where idealism was enough, where the people responded to reason rather than emotion. Rome did not deserve him, and he did not understand Rome. His fate remains unknown.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="obit">
+          <p class="obit-name">Portia</p>
+          <p class="obit-dates">70 BCE – 44 BCE &nbsp;·&nbsp; Wife of Brutus, Daughter of Cato</p>
+          <div class="article-body">
+            <p>The daughter of the great Stoic senator Cato the Younger, Portia was in every sense her father's daughter: fierce, principled, and utterly unwilling to accept any treatment she considered beneath her dignity. When she sensed that her husband Brutus was concealing something of great importance from her, she did not simply ask — she took a knife and wounded her own thigh to prove to him that she could bear pain and keep secrets.</p>
+            <p>It worked. Brutus told her everything. She carried the knowledge of the conspiracy alone for weeks, unable to speak of it to anyone, watching and waiting.</p>
+            <p>When news came that Brutus had fled Rome and that the cause was lost, Portia died — reportedly by swallowing burning coals, a death both horrible and, in its Roman stubbornness, entirely in keeping with who she was. She deserved far better than the story she was given.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="paper-footer">
+    <p>The Roman Post &nbsp;·&nbsp; Est. 753 BCE &nbsp;·&nbsp; Printed in the City of Rome</p>
+    <p>All dispatches verified by Post correspondents &nbsp;·&nbsp; I Sestertius per edition</p>
+  </footer>
+
+</div>
+
+<script>
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const el = document.querySelector(a.getAttribute('href'));
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>
+
+</body>
+</html>
